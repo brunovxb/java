@@ -1,7 +1,5 @@
  package lib.bruno.Shape;
 
-import java.math;
-
 public class Quadri {
 
     double lon;
@@ -12,11 +10,11 @@ public class Quadri {
         this.lar=largeur;
     }
 
-    public Perimetre(){
-        return 2 * ( this.lar + this.lon );
+    public double Perimetre(){
+        return ( this.lar + this.lon ) * 2;
     }
 
-    public Surface(){
+    public double Surface(){
         return this.lon * this.lar;
     }
 }
