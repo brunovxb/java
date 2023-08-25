@@ -1,14 +1,14 @@
-import java.io.*;
+// import java.io.*;
 import java.sql.*;
 
 public class getData{
 
     public static void main(String[] args){
 
-        String url = "jdbc:mysql://host/database";
+        String url = "jdbc:mysql://localhost/brunoDB";
         // String user = "user";
-        String user = "user";
-        String password = "passw";
+        String user = "bruno";
+        String password = "bob000";
         
 
         try {
@@ -20,7 +20,7 @@ public class getData{
             // Lit la requête SQL à partir du fichier
             // String query = readQueryFromFile(queryFile);
            
-            String query = "SELECT col1, col2, col3 FROM table WHERE col1='Value';\n";
+            String query = "SELECT * FROM testTable;\n";
             
             // System.out.println(query);
 
