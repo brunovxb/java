@@ -1,6 +1,6 @@
 package lib.bruno.Shape;
 
-import java.math;
+import java.math.*;
 
 public class Cercle {
 
