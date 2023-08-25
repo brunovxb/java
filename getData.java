@@ -5,7 +5,7 @@ public class getData{
 
     public static void main(String[] args){
 
-        String url = "jdbc:mysql://localhost/brunoDB";
+        String url = "jdbc:mysql://localhost:3307/brunoDB";
         // String user = "user";
         String user = "bruno";
         String password = "bob000";
@@ -20,7 +20,7 @@ public class getData{
             // Lit la requête SQL à partir du fichier
             // String query = readQueryFromFile(queryFile);
            
-            String query = "SELECT * FROM testTable;\n";
+            String query = "SELECT * FROM testTable ORDER BY date_nais;\n";
             
             // System.out.println(query);
 
@@ -36,8 +36,13 @@ public class getData{
 
 
             while(rs.next()){
-            for (int i = 1; i <= nbCols; i++)
-               System.out.print(rs.getString(i) + ";");
+            for (int i = 1; i <= nbCols; i++){
+                  System.out.print(rs.getString(i));
+                  if(i<nbCols){
+                    System.out.print(";");
+                  }
+            }
+             
             System.out.println();
             // System.out.println(data);
             }
