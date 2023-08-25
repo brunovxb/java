@@ -5,11 +5,10 @@ public class getData{
 
     public static void main(String[] args){
 
-        String url = "jdbc:mysql://fr-rc-autzos-x1:13306/automator370";
-        // String user = "automator370_lec";
-        String user = "automator370_ms";
-        // String password = "GlutenAdn02";
-        String password = "pz6pJ40D";
+        String url = "jdbc:mysql://host/database";
+        // String user = "user";
+        String user = "user";
+        String password = "passw";
         
 
         try {
