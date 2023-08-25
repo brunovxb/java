@@ -1,7 +1,5 @@
 package lib.bruno.Shape;
 
-import java.math.*;
-
 public class Cercle {
 
     double rayon;
