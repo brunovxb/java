@@ -1,4 +1,10 @@
 // import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.*;
 
 public class getData{
@@ -20,7 +26,7 @@ public class getData{
             // Lit la requête SQL à partir du fichier
             // String query = readQueryFromFile(queryFile);
            
-            String query = "SELECT * FROM testTable ORDER BY date_nais;\n";
+            String query = "SELECT nom,prenom,date_nais as 'date de naissance' FROM testTable ORDER BY date_nais;\n";
             
             // System.out.println(query);
 
@@ -31,20 +37,39 @@ public class getData{
             ResultSet rs = stmt.executeQuery(query);
             ResultSetMetaData rsmd = rs.getMetaData();
             int nbCols = rsmd.getColumnCount();
-
+            
+            String entete="";
             System.out.println("NB col de rs : " + nbCols);
-
-
-            while(rs.next()){
-            for (int i = 1; i <= nbCols; i++){
-                  System.out.print(rs.getString(i));
-                  if(i<nbCols){
-                    System.out.print(";");
-                  }
+            for(int i=1;i<=nbCols;i++){
+                entete+="\""+rsmd.getColumnLabel(i)+"\"";
+                System.out.println(i+". "+rsmd.getColumnLabel(i));
+                if(i<nbCols){
+                    entete+=";";       
+                }
             }
-             
-            System.out.println();
-            // System.out.println(data);
+            entete+="\n"; 
+
+            Path fichier = Paths.get("monfichier.csv");
+            Charset charset = Charset.forName("UTF-8");
+
+            try (BufferedWriter writer = Files.newBufferedWriter(fichier, charset)) {
+                writer.write(entete, 0 ,entete.length());
+                while(rs.next()){
+                    String outdata="";
+                    for (int i = 1; i <= nbCols; i++){
+                        outdata+="\""+rs.getString(i)+"\"";
+                        if(i<nbCols){
+                            outdata+=";";
+                        }
+                    }
+
+                    outdata+="\n";
+                    System.out.print(outdata);
+                    writer.write(outdata, 0 ,outdata.length());
+                    // System.out.println(data);
+                }
+            } catch (IOException ioe) {
+               ioe.printStackTrace();
             }
 
             rs.close();

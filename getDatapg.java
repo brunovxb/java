@@ -3,6 +3,10 @@ import java.sql.*;
 
 public class getDatapg{
 
+    public static int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
+
     public static void main(String[] args){
 
         String url = "jdbc:postgresql://gentootux:5432/bruno";
@@ -16,19 +20,22 @@ public class getDatapg{
             // Charge le pilote JDBC approprié en fonction du type de base de données
             Class.forName("org.postgresql.Driver");
             conn = DriverManager.getConnection(url, user, password);
-            
+            int rnd=getRandomNumber(1,500); 
             // Lit la requête SQL à partir du fichier
             // String query = readQueryFromFile(queryFile);
            
-            String query = "select ar.artiste,gar.title,gar.\"year\"  from grand_albums_rock_4 gar inner join artistes_rock ar on gar.id_artistes_rock=ar.id order by 1;\n";
-            
+            // String query = "select ar.artiste,gar.title,gar.\"year\"  from grand_albums_rock_4 gar inner join artistes_rock ar on gar.id_artistes_rock=ar.id order by 1;\n";
+            String query = "select artiste, title,\"year\"  from albums_rock where id=?;\n";
+
             // System.out.println(query);
 
             // Crée un objet Statement pour exécuter la requête SQL
-            Statement stmt = conn.createStatement();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setInt(1,rnd);
 
             // Exécute la requête SQL et récupère le résultat
-            ResultSet rs = stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery();
             ResultSetMetaData rsmd = rs.getMetaData();
             int nbCols = rsmd.getColumnCount();
 
