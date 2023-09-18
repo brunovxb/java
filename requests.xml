@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<queries>
+    <select id="001">
+        <url>jdbc:mysql://fr-ex-autzos-x1:13306/automator370</url>
+        <user>automator_lec</user>
+        <passwd>XXXXXXXXXX</passwd>
+        <query>
+select distinctrow te.V_ENAME as "Graphe Automator", 
+	cp2.V_PNAME as "Règle de planification (Niveau graphe)",
+	coalesce (toa.V_ANAME, '-- Job à la racine --' ) as "Application (si absent : job à la racine)", 
+	coalesce (cp.V_PNAME, ' -- Sans Objet --') as "Règle de planification (Niveau application)",
+	toj.V_JNAME as "Nom Job", 
+		-- toj.ID_AGENT as "Serveur de Production",
+		case left(toj.ID_AGENT,2) 
+		when 'AG' then 
+			(select distinct ca.M_HNAME 
+			from cf_agt ca 
+			where ca.ID_KEY = toj.ID_AGENT)
+		when 'VA' then 
+			(select distinctrow case left(tov2.V_VALUE,2)
+						when 'AG' then
+							(select distinct cax.M_HNAME 
+							from automator370.cf_agt cax 
+							where cax.ID_KEY = tov2.V_VALUE)
+						when 'US' then
+							(select distinct cu.V_UNAME 
+							from automator370.cf_user cu  
+							where cu.ID_KEY = tov2.V_VALUE)
+						when 'PL' then
+							(select distinct cpx.V_PNAME 
+							from automator370.cf_plng cpx  
+							where cpx.ID_KEY = tov2.V_VALUE)
+						else tov2.V_VALUE 
+					end as V_EXPOSED_VALUE
+			FROM automator370.to_var tov2
+			where tov2.ID_KEY = toj.ID_AGENT )
+		else 
+			'Inconnu'
+		end as "Serveur de production",
+		case left(toj.V_SCRIPT,1)
+		when '&lt;' then 
+			toj.V_JNAME 
+		else 
+			toj.V_SCRIPT 
+		end as "Script executé (nom job sinon)", 
+		coalesce (toj.V_DESC," -- Pas de description --") as "Descritption"
+from automator370.to_obj_job toj  
+	inner join automator370.to_env te on toj.ID_ENV = te.ID_KEY 
+	left join automator370.cf_plng cp2 on te.ID_PLNG = cp2.ID_KEY
+	left join automator370.to_obj_app toa on toj .ID_APP = toa .ID_KEY 
+	left join automator370.cf_plng cp on toa.ID_PLNG = cp.ID_KEY 
+where toj.ID_ENV like 'EB%'
+and ((te.V_ENAME like 'PADZ%' or te.V_ENAME like 'PROD%' ) and te.V_ENAME not like '%_WPL' )
+and te.V_ENAME not like '%ARRET%'
+and te.V_ENAME not like '%fresh_Lys%'
+and te.V_ENAME not like '%Save_anuelle'
+and te.V_ENAME &lt;&gt; 'PADZ_ZZ_RATTRAP_IA19'
+and te.V_ENAME &lt;&gt; 'PADZ_INFOCENTRE_LOG_UNIX'
+and te.V_ENAME &lt;&gt; 'PADZ_PROJET_WPS'
+and toj.V_SCRIPT not in ('placebo.sh')
+and (toj.ID_AGENT in 
+		(SELECT ID_KEY 
+		FROM automator370.to_var 
+		where V_VALUE in 
+			(SELECT distinct ID_KEY 
+			FROM automator370.cf_agt 
+			-- where M_HNAME in ('crocus','fr-ex-batdom-x','lys')
+			where M_HNAME in ('crocus', 'lys')
+			-- where M_HNAME in ('fr-ex-batdom-x')
+			-- WHERE M_HNAME='crocus'
+			-- WHERE M_HNAME='fr-ex-geocod-x1'
+			))
+or toj.ID_AGENT in 
+		(SELECT distinct ID_KEY 
+		FROM automator370.cf_agt 
+		-- where M_HNAME in ('crocus','fr-ex-batdom-x','lys')
+		where M_HNAME in ('crocus','lys')
+		-- where M_HNAME in ('fr-ex-batdom-x')
+		-- where M_HNAME='crocus'
+		-- WHERE M_HNAME='fr-ex-geoloc-x1'
+		)
+	)
+order by te.V_ENAME, 
+		toa.V_ANAME, 
+		toj.V_SCRIPT
+;
+        </query>
+    </select>
+</queries>
